@@ -1,0 +1,66 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * A business network where members can grant/revoke access to their personal information to other members
+ */
+namespace org.acme.pii
+
+concept IdProof {
+  o String passport
+  o String driverLicense
+}
+
+participant IdentityOwner identified by email {
+  o String email
+  o String firstName
+  o String lastName
+  o String dob optional
+  o IdProof id optional
+  o String[] authorized optional // people authorized to access Member's info
+}
+
+// TODO: assign booking to a ServiceProvider who owns it
+asset Booking identified by unit {
+  o String unit
+  o String inUse
+  --> IdentityOwner owner
+  --> ServiceProvider provider // generated ID of person using the Booking
+
+}
+
+participant ServiceProvider identified by businessName {
+  o String businessName
+}
+
+transaction MakeBooking {
+    o String unit
+    --> IdentityOwner owner
+    --> ServiceProvider provider
+}
+
+abstract transaction MemberTransaction {
+  o String memberId
+}
+
+// TODO: complete other transactions
+transaction AuthorizeAccess extends MemberTransaction {
+}
+
+transaction RevokeAccess extends MemberTransaction {
+}
+
+event MemberEvent {
+  o MemberTransaction memberTransaction
+}
